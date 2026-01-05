@@ -67,6 +67,7 @@ const PharmacySidebar = ({ children }: PharmacySidebarProps) => {
               </Link>
             ))}
             <ThemeDropdown />
+
           </nav>
 
           <div className="p-4 border-t border-border space-y-2">

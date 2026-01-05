@@ -3,10 +3,12 @@ import { Button } from "../components/ui/button";
 import { Pill, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
+import LanguageSwitcher, { useLanguage } from "./LanguageSwitcher";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { t } = useLanguage();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -27,23 +29,30 @@ const Navbar = () => {
               to="/" 
               className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/') ? 'text-primary' : 'text-muted-foreground'}`}
             >
-              Home
+              {t("home")}
             </Link>
             <Link 
               to="/search" 
               className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/search') ? 'text-primary' : 'text-muted-foreground'}`}
             >
-              Find Medicine
+              {t("findMedicine")}
+            </Link>
+            <Link 
+              to="/about" 
+              className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/about') ? 'text-primary' : 'text-muted-foreground'}`}
+            >
+              {t("about")}
             </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher />
             <ThemeToggle />
             <Button variant="ghost" asChild>
-              <Link to="/login">Login</Link>
+              <Link to="/login">{t("login")}</Link>
             </Button>
             <Button variant="hero" asChild>
-              <Link to="/register">Get Started</Link>
+              <Link to="/register">{t("getStarted")}</Link>
             </Button>
           </div>
 
@@ -65,22 +74,30 @@ const Navbar = () => {
                 className="text-sm font-medium text-muted-foreground hover:text-primary"
                 onClick={() => setIsOpen(false)}
               >
-                Home
+                {t("home")}
               </Link>
               <Link 
                 to="/search" 
                 className="text-sm font-medium text-muted-foreground hover:text-primary"
                 onClick={() => setIsOpen(false)}
               >
-                Find Medicine
+                {t("findMedicine")}
+              </Link>
+              <Link 
+                to="/about" 
+                className="text-sm font-medium text-muted-foreground hover:text-primary"
+                onClick={() => setIsOpen(false)}
+              >
+                {t("about")}
               </Link>
               <div className="flex items-center gap-3 pt-4 border-t border-border">
+                <LanguageSwitcher />
                 <ThemeToggle />
                 <Button variant="ghost" asChild className="flex-1">
-                  <Link to="/login" onClick={() => setIsOpen(false)}>Login</Link>
+                  <Link to="/login" onClick={() => setIsOpen(false)}>{t("login")}</Link>
                 </Button>
                 <Button variant="hero" asChild className="flex-1">
-                  <Link to="/register" onClick={() => setIsOpen(false)}>Get Started</Link>
+                  <Link to="/register" onClick={() => setIsOpen(false)}>{t("getStarted")}</Link>
                 </Button>
               </div>
             </div>

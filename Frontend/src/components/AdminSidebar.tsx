@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import { 
-  Pill, 
-  LayoutDashboard, 
-  FileText, 
+import {
+  Pill,
+  LayoutDashboard,
+  FileText,
   Building2,
-  User, 
+  User,
   Menu,
   LogOut,
   ChevronLeft,
@@ -35,7 +35,7 @@ const AdminSidebar = ({ children }: AdminSidebarProps) => {
     <div className="min-h-screen bg-background flex">
       {/* Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
@@ -62,19 +62,17 @@ const AdminSidebar = ({ children }: AdminSidebarProps) => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  isActive(item.path)
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive(item.path)
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                }`}
+                  }`}
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
               </Link>
-              
             ))}
-            
             <ThemeDropdown />
+
           </nav>
 
           <div className="p-4 border-t border-border space-y-2">

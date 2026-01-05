@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { Pill, Mail, Phone, MapPin } from "lucide-react";
+import { useLanguage } from "../components/LanguageSwitcher";
 
 const Footer = () => {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
@@ -14,39 +17,39 @@ const Footer = () => {
               <span className="text-xl font-bold text-gradient">UMUTI</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Find your medicine at the nearest pharmacy. Quick, easy, and reliable.
+              {t("footerDescription")}
             </p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <h4 className="font-semibold mb-4">{t("quickLinks")}</h4>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Home
+                  {t("home")}
                 </Link>
               </li>
               <li>
                 <Link to="/search" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Find Medicine
+                  {t("findMedicine")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">For Pharmacies</h4>
+            <h4 className="font-semibold mb-4">{t("forPharmacies")}</h4>
             <ul className="space-y-2">
               <li>
                 <Link to="/register" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Register Pharmacy
+                  {t("registerPharmacy")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
+            <h4 className="font-semibold mb-4">{t("contact")}</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary" />
@@ -66,7 +69,7 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-border text-center">
           <p className="text-sm text-muted-foreground">
-            © 2025 UMUTI. All rights reserved.
+            © 2025 UMUTI. {t("allRightsReserved")}
           </p>
         </div>
       </div>
