@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import PharmacySidebar from "../../components/PharmacySidebar";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -6,7 +6,8 @@ import { Label } from "../../components/ui/label";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
-import { Plus, Search, Edit, Trash2, Package, X } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { Plus, Search, Edit, Trash2, Package, X, Upload, FileText, Loader2 } from "lucide-react";
 import { useToast } from "../../hooks/use-toast";
 import { useLanguage } from "../../components/LanguageSwitcher";
 
@@ -39,6 +40,9 @@ const PharmacyMedicines = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
+  const [addMode, setAddMode] = useState<"manual" | "document">("manual");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -115,6 +119,7 @@ const PharmacyMedicines = () => {
       strength: medicine.strength,
     });
     setSimilarMedicines(medicine.similarMedicines || []);
+    setAddMode("manual");
     setIsAddOpen(true);
   };
 
@@ -129,12 +134,117 @@ const PharmacyMedicines = () => {
     setNewSimilar({ name: "", price: "" });
     setEditingMedicine(null);
     setIsAddOpen(false);
+    setAddMode("manual");
   };
 
   const getStockStatus = (stock: number) => {
     if (stock === 0) return { label: t("outOfStock"), className: "bg-destructive/10 text-destructive" };
     if (stock < 20) return { label: t("lowStock"), className: "bg-warning/10 text-warning" };
     return { label: t("inStock"), className: "bg-success/10 text-success" };
+  };
+
+  const parseCSV = (content: string): Medicine[] => {
+    const lines = content.trim().split("\n");
+    const parsedMedicines: Medicine[] = [];
+    
+    // Skip header row if exists
+    const startIndex = lines[0].toLowerCase().includes("name") ? 1 : 0;
+    
+    for (let i = startIndex; i < lines.length; i++) {
+      const values = lines[i].split(",").map(v => v.trim().replace(/"/g, ""));
+      if (values.length >= 4) {
+        parsedMedicines.push({
+          id: Date.now().toString() + i,
+          name: values[0] || "",
+          category: values[1] || "",
+          stock: parseInt(values[2]) || 0,
+          price: parseInt(values[3]) || 0,
+          expiryDate: values[4] || new Date().toISOString().split("T")[0],
+          strength: values[5] || "",
+          similarMedicines: [],
+        });
+      }
+    }
+    return parsedMedicines;
+  };
+
+  const parseTXT = (content: string): Medicine[] => {
+    const lines = content.trim().split("\n");
+    const parsedMedicines: Medicine[] = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      // Try to parse as: Name | Category | Stock | Price | Expiry | Strength
+      const parts = line.split(/[|,\t]/).map(p => p.trim());
+      if (parts.length >= 4) {
+        parsedMedicines.push({
+          id: Date.now().toString() + i,
+          name: parts[0] || "",
+          category: parts[1] || "",
+          stock: parseInt(parts[2]) || 0,
+          price: parseInt(parts[3]) || 0,
+          expiryDate: parts[4] || new Date().toISOString().split("T")[0],
+          strength: parts[5] || "",
+          similarMedicines: [],
+        });
+      }
+    }
+    return parsedMedicines;
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsProcessing(true);
+
+    try {
+      const content = await file.text();
+      let parsedMedicines: Medicine[] = [];
+
+      if (file.name.endsWith(".csv")) {
+        parsedMedicines = parseCSV(content);
+      } else if (file.name.endsWith(".txt")) {
+        parsedMedicines = parseTXT(content);
+      } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
+        // For Excel files, we'd need a library like xlsx
+        // For now, show a message about supported formats
+        toast({
+          title: t("importError"),
+          description: "Excel files require additional setup. Please use CSV or TXT format.",
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      if (parsedMedicines.length > 0) {
+        setMedicines([...medicines, ...parsedMedicines]);
+        toast({
+          title: `${parsedMedicines.length} ${t("medicinesImported")}`,
+        });
+        resetForm();
+      } else {
+        toast({
+          title: t("importError"),
+          description: "No valid medicines found in the file. Please check the format.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: t("importError"),
+        description: "Could not read the file. Please try again.",
+        variant: "destructive",
+      });
+    }
+
+    setIsProcessing(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -157,125 +267,186 @@ const PharmacyMedicines = () => {
               <DialogHeader>
                 <DialogTitle>{editingMedicine ? t("editMedicine") : t("addNewMedicine")}</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label>{t("medicineName")}</Label>
-                  <Input 
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder={t("medicineNamePlaceholder")}
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>{t("category")}</Label>
-                    <Input 
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      placeholder={t("categoryPlaceholder")}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{t("strength")}</Label>
-                    <Input 
-                      value={formData.strength}
-                      onChange={(e) => setFormData({ ...formData, strength: e.target.value })}
-                      placeholder={t("strengthPlaceholder")}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>{t("stockQuantity")}</Label>
-                    <Input 
-                      type="number"
-                      value={formData.stock}
-                      onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                      placeholder="0"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{t("price")}</Label>
-                    <Input 
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      placeholder="0"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("expiryDate")}</Label>
-                  <Input 
-                    type="date"
-                    value={formData.expiryDate}
-                    onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
-                    required
-                  />
-                </div>
 
-                {/* Similar Medicines Section */}
-                <div className="space-y-3 pt-4 border-t">
-                  <Label className="text-base font-semibold">{t("similarMedicines")}</Label>
-                  
-                  {/* Add new similar medicine */}
-                  <div className="flex gap-2">
-                    <Input 
-                      value={newSimilar.name}
-                      onChange={(e) => setNewSimilar({ ...newSimilar, name: e.target.value })}
-                      placeholder={t("similarMedicineName")}
-                      className="flex-1"
+              {!editingMedicine && (
+                <Tabs value={addMode} onValueChange={(v) => setAddMode(v as "manual" | "document")} className="mb-4">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="manual">
+                      <Edit className="w-4 h-4 mr-2" />
+                      {t("addManually")}
+                    </TabsTrigger>
+                    <TabsTrigger value="document">
+                      <Upload className="w-4 h-4 mr-2" />
+                      {t("addFromDocument")}
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
+
+              {addMode === "document" && !editingMedicine ? (
+                <div className="space-y-6 py-4">
+                  <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".csv,.txt,.xlsx,.xls"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      id="file-upload"
                     />
+                    
+                    {isProcessing ? (
+                      <div className="space-y-4">
+                        <Loader2 className="w-12 h-12 mx-auto text-primary animate-spin" />
+                        <p className="text-muted-foreground">{t("processingDocument")}</p>
+                      </div>
+                    ) : (
+                      <>
+                        <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">{t("uploadDocument")}</h3>
+                        <p className="text-sm text-muted-foreground mb-4">{t("uploadDocumentDesc")}</p>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t("selectFile")}
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-4">{t("supportedFormats")}</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="bg-secondary/50 rounded-lg p-4">
+                    <h4 className="font-medium mb-2">Expected Format (CSV/TXT):</h4>
+                    <code className="text-xs text-muted-foreground block">
+                      Name, Category, Stock, Price, ExpiryDate, Strength<br />
+                      Paracetamol 500mg, Pain Relief, 100, 500, 2026-12-31, 500mg - Mild<br />
+                      Amoxicillin 250mg, Antibiotic, 50, 1500, 2025-06-30, 250mg - Standard
+                    </code>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>{t("medicineName")}</Label>
                     <Input 
-                      type="number"
-                      value={newSimilar.price}
-                      onChange={(e) => setNewSimilar({ ...newSimilar, price: e.target.value })}
-                      placeholder={t("similarMedicinePrice")}
-                      className="w-32"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder={t("medicineNamePlaceholder")}
+                      required
                     />
-                    <Button type="button" variant="outline" onClick={handleAddSimilar}>
-                      {t("addSimilar")}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>{t("category")}</Label>
+                      <Input 
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        placeholder={t("categoryPlaceholder")}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{t("strength")}</Label>
+                      <Input 
+                        value={formData.strength}
+                        onChange={(e) => setFormData({ ...formData, strength: e.target.value })}
+                        placeholder={t("strengthPlaceholder")}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>{t("stockQuantity")}</Label>
+                      <Input 
+                        type="number"
+                        value={formData.stock}
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                        placeholder="0"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{t("price")}</Label>
+                      <Input 
+                        type="number"
+                        value={formData.price}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        placeholder="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t("expiryDate")}</Label>
+                    <Input 
+                      type="date"
+                      value={formData.expiryDate}
+                      onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  {/* Similar Medicines Section */}
+                  <div className="space-y-3 pt-4 border-t">
+                    <Label className="text-base font-semibold">{t("similarMedicines")}</Label>
+                    
+                    {/* Add new similar medicine */}
+                    <div className="flex gap-2">
+                      <Input 
+                        value={newSimilar.name}
+                        onChange={(e) => setNewSimilar({ ...newSimilar, name: e.target.value })}
+                        placeholder={t("similarMedicineName")}
+                        className="flex-1"
+                      />
+                      <Input 
+                        type="number"
+                        value={newSimilar.price}
+                        onChange={(e) => setNewSimilar({ ...newSimilar, price: e.target.value })}
+                        placeholder={t("similarMedicinePrice")}
+                        className="w-32"
+                      />
+                      <Button type="button" variant="outline" onClick={handleAddSimilar}>
+                        {t("addSimilar")}
+                      </Button>
+                    </div>
+
+                    {/* List of similar medicines */}
+                    {similarMedicines.length > 0 && (
+                      <div className="space-y-2">
+                        {similarMedicines.map((similar, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                            <div>
+                              <span className="font-medium">{similar.name}</span>
+                              <span className="text-muted-foreground ml-2">- {similar.price.toLocaleString()} RWF</span>
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleRemoveSimilar(index)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <Button type="button" variant="outline" className="flex-1" onClick={resetForm}>
+                      {t("cancel")}
+                    </Button>
+                    <Button type="submit" variant="hero" className="flex-1">
+                      {editingMedicine ? t("update") : t("addMedicine")}
                     </Button>
                   </div>
-
-                  {/* List of similar medicines */}
-                  {similarMedicines.length > 0 && (
-                    <div className="space-y-2">
-                      {similarMedicines.map((similar, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                          <div>
-                            <span className="font-medium">{similar.name}</span>
-                            <span className="text-muted-foreground ml-2">- {similar.price.toLocaleString()} RWF</span>
-                          </div>
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleRemoveSimilar(index)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <Button type="button" variant="outline" className="flex-1" onClick={resetForm}>
-                    {t("cancel")}
-                  </Button>
-                  <Button type="submit" variant="hero" className="flex-1">
-                    {editingMedicine ? t("update") : t("addMedicine")}
-                  </Button>
-                </div>
-              </form>
+                </form>
+              )}
             </DialogContent>
           </Dialog>
         </div>

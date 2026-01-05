@@ -8,7 +8,6 @@ import { Button } from "../components/ui/button";
 import { Globe } from "lucide-react";
 import { useState, createContext, useContext } from "react";
 import type { ReactNode } from "react";
-import { cn } from "../lib/utils";
 type Language = "en" | "rw" | "fr";
 
 interface LanguageContextType {
@@ -114,6 +113,37 @@ const translations: Record<Language, Record<string, string>> = {
     strengthPlaceholder: "e.g., 500mg, Strong, Mild",
     similarMedicines: "Similar Medicines",
     similarMedicineName: "Similar Medicine Name",
+    
+    // Search Page
+    findMedicineNearYou: "Find Medicine Near You",
+    yourLocation: "Your Location",
+    locationPlaceholder: "Enter your location (e.g., Kigali, Nyarugenge)",
+    useCurrentLocation: "Use my current location",
+    searchResults: "Results for",
+    foundIn: "Found in",
+    pharmaciesNearYou: "pharmacies near you",
+    getDirections: "Get Directions",
+    call: "Call",
+    filter: "Filter",
+    pharmaciesNearYouMap: "Pharmacies Near You",
+    mapComingSoon: "Map integration coming soon",
+    clickGetDirections: "Click 'Get Directions' to open in Google Maps",
+    searchForMedicine: "Search for Medicine",
+    enterMedicineName: "Enter the name of the medicine you're looking for to find pharmacies near you with available stock.",
+    similarMedicinesAvailable: "Similar Medicines Available",
+    viewAlternative: "View Alternative",
+    distanceFromYou: "from you",
+    
+    // Document Upload
+    addManually: "Add Manually",
+    addFromDocument: "Add from Document",
+    uploadDocument: "Upload Document",
+    uploadDocumentDesc: "Upload an Excel, CSV, or text file with medicine data",
+    selectFile: "Select File",
+    supportedFormats: "Supported formats: .xlsx, .csv, .txt",
+    processingDocument: "Processing document...",
+    medicinesImported: "medicines imported successfully",
+    importError: "Error importing medicines",
     similarMedicinePrice: "Price (RWF)",
     addSimilar: "Add Similar",
     removeSimilar: "Remove",
@@ -222,6 +252,37 @@ const translations: Record<Language, Record<string, string>> = {
     addSimilar: "Ongeraho Usa",
     removeSimilar: "Kuraho",
     
+    // Search Page
+    findMedicineNearYou: "Shakisha Umuti Hafi Yawe",
+    yourLocation: "Aho Uri",
+    locationPlaceholder: "Andika aho uri (urugero: Kigali, Nyarugenge)",
+    useCurrentLocation: "Koresha aho ndi",
+    searchResults: "Ibisubizo bya",
+    foundIn: "Yabonetse muri",
+    pharmaciesNearYou: "farumasi ziri hafi yawe",
+    getDirections: "Bona Inzira",
+    call: "Hamagara",
+    filter: "Shungura",
+    pharmaciesNearYouMap: "Farumasi Ziri Hafi Yawe",
+    mapComingSoon: "Ikarita iraza vuba",
+    clickGetDirections: "Kanda 'Bona Inzira' kugirango ufungure muri Google Maps",
+    searchForMedicine: "Shakisha Umuti",
+    enterMedicineName: "Andika izina ry'umuti ushaka kugirango ubone farumasi ziri hafi yawe zifite stock.",
+    similarMedicinesAvailable: "Imiti Isa Nayo Iraboneka",
+    viewAlternative: "Reba Iyindi",
+    distanceFromYou: "uvuye aho uri",
+    
+    // Document Upload
+    addManually: "Ongeraho Wenyine",
+    addFromDocument: "Ongeraho Binyuze mu Nyandiko",
+    uploadDocument: "Shyiramo Inyandiko",
+    uploadDocumentDesc: "Shyiramo dosiye ya Excel, CSV, cyangwa inyandiko ifite amakuru y'imiti",
+    selectFile: "Hitamo Dosiye",
+    supportedFormats: "Ubwoko bushyigikiwe: .xlsx, .csv, .txt",
+    processingDocument: "Gusoma inyandiko...",
+    medicinesImported: "imiti yashyizwe neza",
+    importError: "Ikosa mu gushyira imiti",
+    
     // Ad Carousel
     premiumPartner: "Umunyamuryango Wujuje",
     rating: "amanota",
@@ -326,6 +387,37 @@ const translations: Record<Language, Record<string, string>> = {
     addSimilar: "Ajouter Similaire",
     removeSimilar: "Supprimer",
     
+    // Search Page
+    findMedicineNearYou: "Trouver Médicament Près de Vous",
+    yourLocation: "Votre Emplacement",
+    locationPlaceholder: "Entrez votre emplacement (ex: Kigali, Nyarugenge)",
+    useCurrentLocation: "Utiliser ma position actuelle",
+    searchResults: "Résultats pour",
+    foundIn: "Trouvé dans",
+    pharmaciesNearYou: "pharmacies près de vous",
+    getDirections: "Obtenir l'Itinéraire",
+    call: "Appeler",
+    filter: "Filtrer",
+    pharmaciesNearYouMap: "Pharmacies Près de Vous",
+    mapComingSoon: "Intégration de carte bientôt disponible",
+    clickGetDirections: "Cliquez sur 'Obtenir l'Itinéraire' pour ouvrir dans Google Maps",
+    searchForMedicine: "Rechercher un Médicament",
+    enterMedicineName: "Entrez le nom du médicament que vous recherchez pour trouver les pharmacies près de vous avec du stock disponible.",
+    similarMedicinesAvailable: "Médicaments Similaires Disponibles",
+    viewAlternative: "Voir Alternative",
+    distanceFromYou: "de vous",
+    
+    // Document Upload
+    addManually: "Ajouter Manuellement",
+    addFromDocument: "Ajouter depuis Document",
+    uploadDocument: "Télécharger Document",
+    uploadDocumentDesc: "Téléchargez un fichier Excel, CSV ou texte avec les données des médicaments",
+    selectFile: "Sélectionner Fichier",
+    supportedFormats: "Formats supportés: .xlsx, .csv, .txt",
+    processingDocument: "Traitement du document...",
+    medicinesImported: "médicaments importés avec succès",
+    importError: "Erreur lors de l'importation des médicaments",
+    
     // Ad Carousel
     premiumPartner: "Partenaire Premium",
     rating: "note",
@@ -365,63 +457,30 @@ const languageLabels: Record<Language, string> = {
 const LanguageSwitcher = () => {
   const { language, setLanguage, t } = useLanguage();
 
-  const itemBase =
-    "flex items-center gap-2 rounded-lg px-3 py-2 text-sm cursor-pointer transition-colors";
-
-  const activeItem =
-    "bg-primary text-primary-foreground";
-
-  const inactiveItem =
-    "text-foreground hover:bg-secondary";
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-full hover:bg-secondary"
-        >
+        <Button variant="ghost" size="icon" className="h-9 w-9">
           <Globe className="h-4 w-4" />
           <span className="sr-only">Switch language</span>
         </Button>
       </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        align="end"
-        sideOffset={8}
-        className="
-          w-44 rounded-xl border border-border
-          bg-card p-2 shadow-lg
-          dark:bg-[hsl(152_60%_38%/0.2)]
-        "
-      >
-        <DropdownMenuItem
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem 
           onClick={() => setLanguage("en")}
-          className={cn(
-            itemBase,
-            language === "en" ? activeItem : inactiveItem
-          )}
+          className={language === "en" ? "bg-accent" : ""}
         >
           🇬🇧 {t("english")}
         </DropdownMenuItem>
-
-        <DropdownMenuItem
+        <DropdownMenuItem 
           onClick={() => setLanguage("rw")}
-          className={cn(
-            itemBase,
-            language === "rw" ? activeItem : inactiveItem
-          )}
+          className={language === "rw" ? "bg-accent" : ""}
         >
           🇷🇼 {t("kinyarwanda")}
         </DropdownMenuItem>
-
-        <DropdownMenuItem
+        <DropdownMenuItem 
           onClick={() => setLanguage("fr")}
-          className={cn(
-            itemBase,
-            language === "fr" ? activeItem : inactiveItem
-          )}
+          className={language === "fr" ? "bg-accent" : ""}
         >
           🇫🇷 {t("french")}
         </DropdownMenuItem>
@@ -429,6 +488,5 @@ const LanguageSwitcher = () => {
     </DropdownMenu>
   );
 };
-
 
 export default LanguageSwitcher;

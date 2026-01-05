@@ -1,0 +1,16 @@
+name,price,stock,strength,category,description
+Paracetamol,500,200,500mg,Pain Relief,Common pain reliever and fever reducer
+Amoxicillin,1500,150,250mg,Antibiotics,Broad-spectrum antibiotic for bacterial infections
+Ibuprofen,800,300,400mg,Pain Relief,Anti-inflammatory pain reliever
+Metformin,2000,100,500mg,Diabetes,Blood sugar control medication
+Omeprazole,1200,180,20mg,Digestive,Reduces stomach acid production
+Vitamin C,600,500,1000mg,Vitamins,Immune system support supplement
+Ciprofloxacin,2500,80,500mg,Antibiotics,Fluoroquinolone antibiotic
+Aspirin,400,250,100mg,Pain Relief,Blood thinner and pain reliever
+Cetirizine,700,200,10mg,Allergy,Antihistamine for allergies
+Losartan,1800,120,50mg,Blood Pressure,Blood pressure control medication
+Azithromycin,3000,60,500mg,Antibiotics,Macrolide antibiotic
+Diclofenac,900,180,50mg,Pain Relief,Anti-inflammatory medication
+Atorvastatin,2200,90,20mg,Cholesterol,Cholesterol lowering medication
+Amlodipine,1500,110,5mg,Blood Pressure,Calcium channel blocker
+Pantoprazole,1400,160,40mg,Digestive,Proton pump inhibitor

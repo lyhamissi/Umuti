@@ -1,6 +1,15 @@
 import PharmacySidebar from "../../components/PharmacySidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { Package, TrendingUp, AlertTriangle, DollarSign } from "lucide-react";
+import { Package, TrendingUp, AlertTriangle, DollarSign, Download } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
+import { useExportData } from "../../hooks/useExportData";
+import { toast } from "sonner";
 
 const PharmacyDashboard = () => {
   const stats = [
@@ -18,12 +27,58 @@ const PharmacyDashboard = () => {
     { name: "Metformin 500mg", stock: 8, status: "Low Stock" },
   ];
 
+  const { exportToCSV, exportToJSON } = useExportData();
+
+  const handleExportCSV = () => {
+    const exportData = recentMedicines.map(m => ({
+      name: m.name,
+      stock: m.stock,
+      status: m.status
+    }));
+    exportToCSV(exportData, 'pharmacy_medicines');
+    toast.success('Dashboard data exported as CSV');
+  };
+
+  const handleExportJSON = () => {
+    const exportData = {
+      stats,
+      medicines: recentMedicines,
+      exportedAt: new Date().toISOString()
+    };
+    exportToJSON(exportData, 'pharmacy_dashboard');
+    toast.success('Dashboard data exported as JSON');
+  };
+
   return (
     <PharmacySidebar>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Pharmacy Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Welcome back! Here's your pharmacy overview.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold">Pharmacy Dashboard</h1>
+            <p className="text-muted-foreground mt-1">Welcome back! Here's your pharmacy overview.</p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleExportCSV}>
+                Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportJSON}>
+                Export as JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         </div>
 
         {/* Stats Grid */}
@@ -67,11 +122,10 @@ const PharmacyDashboard = () => {
                       <td className="py-3 px-4 font-medium">{medicine.name}</td>
                       <td className="py-3 px-4 text-muted-foreground">{medicine.stock} units</td>
                       <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          medicine.status === "In Stock" 
-                            ? "bg-success/10 text-success" 
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${medicine.status === "In Stock"
+                            ? "bg-success/10 text-success"
                             : "bg-warning/10 text-warning"
-                        }`}>
+                          }`}>
                           {medicine.status}
                         </span>
                       </td>

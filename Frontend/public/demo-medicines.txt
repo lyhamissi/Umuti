@@ -1,0 +1,9 @@
+name,price,stock,strength,category
+Paracetamol,500,200,500mg,Pain Relief
+Amoxicillin,1500,150,250mg,Antibiotics
+Ibuprofen,800,300,400mg,Pain Relief
+Metformin,2000,100,500mg,Diabetes
+Omeprazole,1200,180,20mg,Digestive
+Vitamin C,600,500,1000mg,Vitamins
+Aspirin,400,250,100mg,Pain Relief
+Cetirizine,700,200,10mg,Allergy

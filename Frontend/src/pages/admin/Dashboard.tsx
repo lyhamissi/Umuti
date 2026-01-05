@@ -1,6 +1,15 @@
 import AdminSidebar from "../../components/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { Building2, FileText, Users, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Building2, FileText, Users, TrendingUp, ArrowUpRight, ArrowDownRight, Download } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
+import { useExportData } from "../../hooks/useExportData";
+import { toast } from "sonner";
 
 const AdminDashboard = () => {
   const stats = [
@@ -24,12 +33,70 @@ const AdminDashboard = () => {
     { name: "Sunrise Pharmacy", owner: "Ange Uwimana", status: "Pending", date: "1 day ago" },
   ];
 
+  const { exportToCSV, exportToJSON } = useExportData();
+
+  const handleExportCSV = () => {
+    const allData = [
+      ...recentTransactions.map(tx => ({
+        type: 'Activity',
+        name: tx.pharmacy,
+        action: tx.type,
+        count: tx.count,
+        date: tx.date
+      })),
+      ...recentApplications.map(app => ({
+        type: 'Application',
+        name: app.name,
+        action: app.owner,
+        count: 0,
+        date: app.date
+      }))
+    ];
+    exportToCSV(allData, 'admin_dashboard');
+    toast.success('Dashboard data exported as CSV');
+  };
+
+  const handleExportJSON = () => {
+    const exportData = {
+      stats,
+      recentTransactions,
+      recentApplications,
+      exportedAt: new Date().toISOString()
+    };
+    exportToJSON(exportData, 'admin_dashboard');
+    toast.success('Dashboard data exported as JSON');
+  };
+
   return (
     <AdminSidebar>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Overview of UMUTI platform</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-muted-foreground mt-1">Overview of UMUTI platform</p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleExportCSV}>
+                Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportJSON}>
+                Export as JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         </div>
 
         {/* Stats Grid */}
