@@ -9,12 +9,9 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useLanguage } from "../components/LanguageSwitcher";
 import { useToast } from "../hooks/use-toast";
-
 interface SimilarMedicine {
   name: string;
   price: string;
-  pharmacyName: string;
-  pharmacyDistance: string;
 }
 
 interface Pharmacy {
@@ -44,8 +41,8 @@ const mockPharmacies: Pharmacy[] = [
     price: "2,500 RWF",
     strength: "500mg - Standard",
     similarMedicines: [
-      { name: "Acetaminophen 500mg", price: "2,200 RWF", pharmacyName: "HealthFirst Pharmacy", pharmacyDistance: "1.2 km" },
-      { name: "Efferalgan 500mg", price: "2,800 RWF", pharmacyName: "MediPlus Drugstore", pharmacyDistance: "2.8 km" },
+      { name: "Acetaminophen 500mg", price: "2,200 RWF" },
+      { name: "Efferalgan 500mg", price: "2,800 RWF" },
     ],
   },
   {
@@ -60,7 +57,7 @@ const mockPharmacies: Pharmacy[] = [
     price: "2,300 RWF",
     strength: "500mg - Standard",
     similarMedicines: [
-      { name: "Doliprane 500mg", price: "2,600 RWF", pharmacyName: "PharmaCare Plus", pharmacyDistance: "0.5 km" },
+      { name: "Doliprane 500mg", price: "2,600 RWF" },
     ],
   },
   {
@@ -88,7 +85,7 @@ const mockPharmacies: Pharmacy[] = [
     price: "2,600 RWF",
     strength: "500mg - Standard",
     similarMedicines: [
-      { name: "Panadol Extra", price: "3,000 RWF", pharmacyName: "PharmaCare Plus", pharmacyDistance: "0.5 km" },
+      { name: "Panadol Extra", price: "3,000 RWF" },
     ],
   },
 ];
@@ -309,19 +306,19 @@ const SearchPage = () => {
                             
                             {expandedSimilar === pharmacy.id && (
                               <div className="mt-2 space-y-2 p-3 bg-secondary/50 rounded-lg">
+                                <p className="text-xs text-muted-foreground mb-2">
+                                  {t("alternativesAtSamePharmacy")}
+                                </p>
                                 {pharmacy.similarMedicines.map((similar, idx) => (
                                   <div key={idx} className="flex items-center justify-between p-2 bg-background rounded">
                                     <div>
                                       <p className="text-sm font-medium">{similar.name}</p>
                                       <p className="text-xs text-muted-foreground">
-                                        {similar.pharmacyName} • {similar.pharmacyDistance}
+                                        {t("availableAt")} {pharmacy.name}
                                       </p>
                                     </div>
                                     <div className="text-right">
                                       <p className="text-sm font-semibold text-primary">{similar.price}</p>
-                                      <Button variant="link" size="sm" className="h-auto p-0 text-xs">
-                                        {t("viewAlternative")}
-                                      </Button>
                                     </div>
                                   </div>
                                 ))}

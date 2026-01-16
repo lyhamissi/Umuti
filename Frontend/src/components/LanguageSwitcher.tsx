@@ -28,7 +28,7 @@ const translations: Record<Language, Record<string, string>> = {
     english: "English",
     kinyarwanda: "Kinyarwanda",
     french: "French",
-    
+
     // Hero Section
     heroTag: "Rwanda's #1 Medicine Finder",
     heroTitle: "Find Your Medicine at the",
@@ -38,7 +38,7 @@ const translations: Record<Language, Record<string, string>> = {
     medicinesListed: "Medicines Listed",
     pharmacies: "Pharmacies",
     happyUsers: "Happy Users",
-    
+
     // Features
     whyChoose: "Why Choose",
     whyChooseDescription: "We connect you with verified pharmacies across Rwanda, making it easy to find the medicine you need.",
@@ -50,20 +50,20 @@ const translations: Record<Language, Record<string, string>> = {
     realTimeStockDesc: "Get accurate, up-to-date inventory information",
     verifiedPharmacies: "Verified Pharmacies",
     verifiedPharmaciesDesc: "All pharmacies are licensed and verified",
-    
+
     // CTA
     pharmacyOwner: "Are You a Pharmacy Owner?",
     pharmacyOwnerDesc: "Join UMUTI to increase your visibility and reach more customers. Manage your inventory easily and grow your business.",
     registerPharmacy: "Register Your Pharmacy",
     loginDashboard: "Login to Dashboard",
-    
+
     // Footer
     footerDescription: "Find your medicine at the nearest pharmacy. Quick, easy, and reliable.",
     quickLinks: "Quick Links",
     forPharmacies: "For Pharmacies",
     contact: "Contact",
     allRightsReserved: "All rights reserved.",
-    
+
     // About Page
     howToUse: "How to Use",
     aboutDescription: "Whether you're looking for medicine or managing a pharmacy, UMUTI makes it simple.",
@@ -83,7 +83,7 @@ const translations: Record<Language, Record<string, string>> = {
     step2PharmacistDesc: "Use the dashboard to add medicines, set prices, and manage stock levels.",
     step3Pharmacist: "Grow your business",
     step3PharmacistDesc: "Customers will find your pharmacy when searching for medicines you have in stock.",
-    
+
     // Medicine Management
     medicines: "Medicines",
     manageInventory: "Manage your pharmacy inventory",
@@ -113,7 +113,7 @@ const translations: Record<Language, Record<string, string>> = {
     strengthPlaceholder: "e.g., 500mg, Strong, Mild",
     similarMedicines: "Similar Medicines",
     similarMedicineName: "Similar Medicine Name",
-    
+
     // Search Page
     findMedicineNearYou: "Find Medicine Near You",
     yourLocation: "Your Location",
@@ -131,9 +131,10 @@ const translations: Record<Language, Record<string, string>> = {
     searchForMedicine: "Search for Medicine",
     enterMedicineName: "Enter the name of the medicine you're looking for to find pharmacies near you with available stock.",
     similarMedicinesAvailable: "Similar Medicines Available",
-    viewAlternative: "View Alternative",
+    alternativesAtSamePharmacy: "Alternative medicines available at this pharmacy:",
+    availableAt: "Available at",
     distanceFromYou: "from you",
-    
+
     // Document Upload
     addManually: "Add Manually",
     addFromDocument: "Add from Document",
@@ -147,7 +148,7 @@ const translations: Record<Language, Record<string, string>> = {
     similarMedicinePrice: "Price (RWF)",
     addSimilar: "Add Similar",
     removeSimilar: "Remove",
-    
+
     // Ad Carousel
     premiumPartner: "Premium Partner",
     rating: "rating",
@@ -163,7 +164,7 @@ const translations: Record<Language, Record<string, string>> = {
     english: "Icyongereza",
     kinyarwanda: "Ikinyarwanda",
     french: "Igifaransa",
-    
+
     // Hero Section
     heroTag: "Uburyo bwa mbere bwo gushakisha imiti mu Rwanda",
     heroTitle: "Shaka Imiti yawe ku",
@@ -173,7 +174,7 @@ const translations: Record<Language, Record<string, string>> = {
     medicinesListed: "Imiti Yanditswe",
     pharmacies: "Farumasi",
     happyUsers: "Abakoresha Bashimye",
-    
+
     // Features
     whyChoose: "Kuki Wahitamo",
     whyChooseDescription: "Duhujije na farumasi zemejwe mu Rwanda hose, bikoroheye gushaka umuti ukeneye.",
@@ -185,20 +186,20 @@ const translations: Record<Language, Record<string, string>> = {
     realTimeStockDesc: "Bona amakuru y'imiti agihe gishya",
     verifiedPharmacies: "Farumasi Zemejwe",
     verifiedPharmaciesDesc: "Farumasi zose zemejwe kandi zifite uruhushya",
-    
+
     // CTA
     pharmacyOwner: "Uri Nyir'ubwishingizi bwa Farumasi?",
     pharmacyOwnerDesc: "Injira muri UMUTI kugirango wongerwe uboneka kandi ugere ku bakiriya benshi. Gera imiti yawe byoroshye kandi uzamure ubucuruzi bwawe.",
     registerPharmacy: "Andikisha Farumasi Yawe",
     loginDashboard: "Injira Kuri Dashboard",
-    
+
     // Footer
     footerDescription: "Shaka umuti wawe ku farumasi iri hafi. Byihuse, byoroshye, kandi bikwizera.",
     quickLinks: "Aho Kwinjira Vuba",
     forPharmacies: "Kuri Farumasi",
     contact: "Twandikire",
     allRightsReserved: "Uburenganzira bwose bwarinzwe.",
-    
+
     // About Page
     howToUse: "Uko Wakoresha",
     aboutDescription: "Niba ushaka umuti cyangwa ugenzura farumasi, UMUTI bikoroshya.",
@@ -218,7 +219,7 @@ const translations: Record<Language, Record<string, string>> = {
     step2PharmacistDesc: "Koresha dashboard yo kongeraho imiti, gushyiraho ibiciro, no gucunga stock.",
     step3Pharmacist: "Zamura ubucuruzi bwawe",
     step3PharmacistDesc: "Abakiriya bazashakisha farumasi yawe iyo bashaka imiti ufite.",
-    
+
     // Medicine Management
     medicines: "Imiti",
     manageInventory: "Genzura imiti ya farumasi yawe",
@@ -251,7 +252,7 @@ const translations: Record<Language, Record<string, string>> = {
     similarMedicinePrice: "Igiciro (RWF)",
     addSimilar: "Ongeraho Usa",
     removeSimilar: "Kuraho",
-    
+
     // Search Page
     findMedicineNearYou: "Shakisha Umuti Hafi Yawe",
     yourLocation: "Aho Uri",
@@ -269,9 +270,10 @@ const translations: Record<Language, Record<string, string>> = {
     searchForMedicine: "Shakisha Umuti",
     enterMedicineName: "Andika izina ry'umuti ushaka kugirango ubone farumasi ziri hafi yawe zifite stock.",
     similarMedicinesAvailable: "Imiti Isa Nayo Iraboneka",
-    viewAlternative: "Reba Iyindi",
+    alternativesAtSamePharmacy: "Imiti isa nayo iboneka kuri iyi farumasi:",
+    availableAt: "Iboneka kuri",
     distanceFromYou: "uvuye aho uri",
-    
+
     // Document Upload
     addManually: "Ongeraho Wenyine",
     addFromDocument: "Ongeraho Binyuze mu Nyandiko",
@@ -282,7 +284,7 @@ const translations: Record<Language, Record<string, string>> = {
     processingDocument: "Gusoma inyandiko...",
     medicinesImported: "imiti yashyizwe neza",
     importError: "Ikosa mu gushyira imiti",
-    
+
     // Ad Carousel
     premiumPartner: "Umunyamuryango Wujuje",
     rating: "amanota",
@@ -298,7 +300,7 @@ const translations: Record<Language, Record<string, string>> = {
     english: "Anglais",
     kinyarwanda: "Kinyarwanda",
     french: "Français",
-    
+
     // Hero Section
     heroTag: "Le #1 Recherche de Médicaments au Rwanda",
     heroTitle: "Trouvez Votre Médicament à la",
@@ -308,7 +310,7 @@ const translations: Record<Language, Record<string, string>> = {
     medicinesListed: "Médicaments Listés",
     pharmacies: "Pharmacies",
     happyUsers: "Utilisateurs Satisfaits",
-    
+
     // Features
     whyChoose: "Pourquoi Choisir",
     whyChooseDescription: "Nous vous connectons avec des pharmacies vérifiées à travers le Rwanda, facilitant la recherche du médicament dont vous avez besoin.",
@@ -320,20 +322,20 @@ const translations: Record<Language, Record<string, string>> = {
     realTimeStockDesc: "Obtenez des informations d'inventaire précises et à jour",
     verifiedPharmacies: "Pharmacies Vérifiées",
     verifiedPharmaciesDesc: "Toutes les pharmacies sont agréées et vérifiées",
-    
+
     // CTA
     pharmacyOwner: "Êtes-vous Propriétaire de Pharmacie?",
     pharmacyOwnerDesc: "Rejoignez UMUTI pour augmenter votre visibilité et atteindre plus de clients. Gérez votre inventaire facilement et développez votre entreprise.",
     registerPharmacy: "Enregistrer Votre Pharmacie",
     loginDashboard: "Connexion au Tableau de Bord",
-    
+
     // Footer
     footerDescription: "Trouvez votre médicament à la pharmacie la plus proche. Rapide, facile et fiable.",
     quickLinks: "Liens Rapides",
     forPharmacies: "Pour les Pharmacies",
     contact: "Contact",
     allRightsReserved: "Tous droits réservés.",
-    
+
     // About Page
     howToUse: "Comment Utiliser",
     aboutDescription: "Que vous cherchiez un médicament ou gériez une pharmacie, UMUTI simplifie tout.",
@@ -353,7 +355,7 @@ const translations: Record<Language, Record<string, string>> = {
     step2PharmacistDesc: "Utilisez le tableau de bord pour ajouter des médicaments, fixer les prix et gérer les niveaux de stock.",
     step3Pharmacist: "Développez votre entreprise",
     step3PharmacistDesc: "Les clients trouveront votre pharmacie lorsqu'ils rechercheront des médicaments que vous avez en stock.",
-    
+
     // Medicine Management
     medicines: "Médicaments",
     manageInventory: "Gérer l'inventaire de votre pharmacie",
@@ -386,7 +388,7 @@ const translations: Record<Language, Record<string, string>> = {
     similarMedicinePrice: "Prix (RWF)",
     addSimilar: "Ajouter Similaire",
     removeSimilar: "Supprimer",
-    
+
     // Search Page
     findMedicineNearYou: "Trouver Médicament Près de Vous",
     yourLocation: "Votre Emplacement",
@@ -404,9 +406,10 @@ const translations: Record<Language, Record<string, string>> = {
     searchForMedicine: "Rechercher un Médicament",
     enterMedicineName: "Entrez le nom du médicament que vous recherchez pour trouver les pharmacies près de vous avec du stock disponible.",
     similarMedicinesAvailable: "Médicaments Similaires Disponibles",
-    viewAlternative: "Voir Alternative",
+    alternativesAtSamePharmacy: "Médicaments alternatifs disponibles dans cette pharmacie:",
+    availableAt: "Disponible à",
     distanceFromYou: "de vous",
-    
+
     // Document Upload
     addManually: "Ajouter Manuellement",
     addFromDocument: "Ajouter depuis Document",
@@ -417,7 +420,7 @@ const translations: Record<Language, Record<string, string>> = {
     processingDocument: "Traitement du document...",
     medicinesImported: "médicaments importés avec succès",
     importError: "Erreur lors de l'importation des médicaments",
-    
+
     // Ad Carousel
     premiumPartner: "Partenaire Premium",
     rating: "note",
@@ -466,19 +469,19 @@ const LanguageSwitcher = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setLanguage("en")}
           className={language === "en" ? "bg-accent" : ""}
         >
           🇬🇧 {t("english")}
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setLanguage("rw")}
           className={language === "rw" ? "bg-accent" : ""}
         >
           🇷🇼 {t("kinyarwanda")}
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setLanguage("fr")}
           className={language === "fr" ? "bg-accent" : ""}
         >
