@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -9,12 +9,9 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useLanguage } from "../components/LanguageSwitcher";
 import { useToast } from "../hooks/use-toast";
-interface SimilarMedicine {
-  name: string;
-  price: string;
-}
+import { searchApi, type SearchResult } from "../lib/api";
 
-interface Pharmacy {
+interface DisplayPharmacy {
   id: string;
   name: string;
   address: string;
@@ -25,115 +22,113 @@ interface Pharmacy {
   quantity: number;
   price: string;
   strength?: string;
-  similarMedicines?: SimilarMedicine[];
+  similarMedicines?: { name: string; price: string }[];
 }
 
-const mockPharmacies: Pharmacy[] = [
-  {
-    id: "1",
-    name: "PharmaCare Plus",
-    address: "KG 7 Ave, Kigali",
-    distance: "0.5 km",
-    phone: "+250 788 123 456",
-    hours: "8:00 AM - 9:00 PM",
-    inStock: true,
-    quantity: 50,
-    price: "2,500 RWF",
-    strength: "500mg - Standard",
-    similarMedicines: [
-      { name: "Acetaminophen 500mg", price: "2,200 RWF" },
-      { name: "Efferalgan 500mg", price: "2,800 RWF" },
-    ],
-  },
-  {
-    id: "2",
-    name: "HealthFirst Pharmacy",
-    address: "KN 3 St, Nyarugenge",
-    distance: "1.2 km",
-    phone: "+250 788 234 567",
-    hours: "7:00 AM - 10:00 PM",
-    inStock: true,
-    quantity: 25,
-    price: "2,300 RWF",
-    strength: "500mg - Standard",
-    similarMedicines: [
-      { name: "Doliprane 500mg", price: "2,600 RWF" },
-    ],
-  },
-  {
-    id: "3",
-    name: "MediPlus Drugstore",
-    address: "KK 15 Ave, Kicukiro",
-    distance: "2.8 km",
-    phone: "+250 788 345 678",
-    hours: "24 Hours",
-    inStock: true,
-    quantity: 100,
-    price: "2,400 RWF",
-    strength: "500mg - Strong",
-    similarMedicines: [],
-  },
-  {
-    id: "4",
-    name: "City Pharmacy",
-    address: "KG 11 Ave, Gasabo",
-    distance: "3.5 km",
-    phone: "+250 788 456 789",
-    hours: "8:00 AM - 8:00 PM",
-    inStock: false,
-    quantity: 0,
-    price: "2,600 RWF",
-    strength: "500mg - Standard",
-    similarMedicines: [
-      { name: "Panadol Extra", price: "3,000 RWF" },
-    ],
-  },
-];
+const formatPrice = (price: number): string => {
+  return `${price.toLocaleString()} RWF`;
+};
+
+const formatDistance = (distanceKm?: number): string => {
+  if (!distanceKm) return "N/A";
+  return `${distanceKm.toFixed(1)} km`;
+};
+
+const mapSearchResultToPharmacy = (result: SearchResult): DisplayPharmacy => ({
+  id: result.pharmacy.id,
+  name: result.pharmacy.name,
+  address: result.pharmacy.address,
+  distance: formatDistance(result.distance),
+  phone: result.pharmacy.phone,
+  hours: result.pharmacy.hours || "Hours not available",
+  inStock: result.inStock,
+  quantity: result.quantity,
+  price: formatPrice(result.price),
+  strength: result.medicine?.strength,
+  similarMedicines: [],
+});
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [location, setLocation] = useState("");
-  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+  const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [pharmacies, setPharmacies] = useState<DisplayPharmacy[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [expandedSimilar, setExpandedSimilar] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const { t } = useLanguage();
   const { toast } = useToast();
 
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery.trim()) return;
+
+    setIsSearching(true);
+    setSearchError(null);
+    setSearchParams({ q: searchQuery, ...(location && { loc: location }) });
+
+    try {
+      const response = await searchApi.searchMedicine({
+        q: searchQuery,
+        lat: userCoords?.lat,
+        lon: userCoords?.lon,
+        radius: 10,
+        inStockOnly: false,
+      });
+
+      if (response.data?.results) {
+        const mappedPharmacies = response.data.results.map(mapSearchResultToPharmacy);
+        setPharmacies(mappedPharmacies);
+      } else {
+        setPharmacies([]);
+      }
+    } catch (err) {
+      const error = err as Error;
+      setSearchError(error.message || "Failed to search. Please try again.");
+      toast({
+        title: "Search Error",
+        description: error.message || "Failed to search. Please try again.",
+        variant: "destructive",
+      });
+      setPharmacies([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [searchQuery, location, userCoords, setSearchParams, toast]);
+
   useEffect(() => {
-    if (searchParams.get("q")) {
+    const query = searchParams.get("q");
+    if (query && query !== searchQuery) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const query = searchParams.get("q");
+    if (query) {
       handleSearch();
     }
   }, []);
-
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-    
-    setIsSearching(true);
-    setSearchParams({ q: searchQuery, ...(location && { loc: location }) });
-    
-    // Simulate API call
-    setTimeout(() => {
-      setPharmacies(mockPharmacies);
-      setIsSearching(false);
-    }, 500);
-  };
 
   const getCurrentLocation = () => {
     setIsLocating(true);
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // In a real app, you'd reverse geocode this to get the address
-          setLocation(`${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`);
+          const coords = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          };
+          setUserCoords(coords);
+          setLocation(`${coords.lat.toFixed(4)}, ${coords.lon.toFixed(4)}`);
           setIsLocating(false);
           toast({ title: t("useCurrentLocation"), description: "Location detected!" });
         },
-        (error) => {
+        () => {
           setIsLocating(false);
-          toast({ 
-            title: "Location Error", 
+          toast({
+            title: "Location Error",
             description: "Could not get your location. Please enter it manually.",
             variant: "destructive"
           });
@@ -141,8 +136,8 @@ const SearchPage = () => {
       );
     } else {
       setIsLocating(false);
-      toast({ 
-        title: "Location Not Supported", 
+      toast({
+        title: "Location Not Supported",
         description: "Your browser doesn't support geolocation.",
         variant: "destructive"
       });
@@ -152,7 +147,7 @@ const SearchPage = () => {
   const openDirections = (address: string) => {
     const origin = location ? encodeURIComponent(location) : "";
     const destination = encodeURIComponent(address + ", Kigali, Rwanda");
-    const url = origin 
+    const url = origin
       ? `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`
       : `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
     window.open(url, "_blank");
@@ -165,7 +160,7 @@ const SearchPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Search Header */}
@@ -173,18 +168,18 @@ const SearchPage = () => {
             <h1 className="text-3xl md:text-4xl font-bold text-center mb-6">
               {t("findMedicineNearYou")}
             </h1>
-            
+
             <div className="space-y-4">
               {/* Medicine Search */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input 
+                  <Input
                     type="text"
                     placeholder={t("searchPlaceholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="pl-12 h-12"
                   />
                 </div>
@@ -192,12 +187,12 @@ const SearchPage = () => {
                   {isSearching ? "..." : t("search")}
                 </Button>
               </div>
-              
+
               {/* Location Input */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input 
+                  <Input
                     type="text"
                     placeholder={t("locationPlaceholder")}
                     value={location}
@@ -205,9 +200,9 @@ const SearchPage = () => {
                     className="pl-12 h-12"
                   />
                 </div>
-                <Button 
-                  onClick={getCurrentLocation} 
-                  variant="outline" 
+                <Button
+                  onClick={getCurrentLocation}
+                  variant="outline"
                   size="lg"
                   disabled={isLocating}
                   className="whitespace-nowrap"
@@ -218,6 +213,16 @@ const SearchPage = () => {
               </div>
             </div>
           </div>
+
+          {/* Error State */}
+          {searchError && (
+            <div className="max-w-4xl mx-auto mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-center">
+              <p className="text-destructive">{searchError}</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Make sure the backend server is running on port 5000
+              </p>
+            </div>
+          )}
 
           {/* Results */}
           {pharmacies.length > 0 && (
@@ -242,8 +247,8 @@ const SearchPage = () => {
                 {/* Pharmacy Cards */}
                 <div className="space-y-4">
                   {pharmacies.map((pharmacy) => (
-                    <Card 
-                      key={pharmacy.id} 
+                    <Card
+                      key={pharmacy.id}
                       className={`transition-all duration-300 ${!pharmacy.inStock ? 'opacity-60' : 'hover:border-primary/50'}`}
                     >
                       <CardContent className="p-6">
@@ -255,7 +260,7 @@ const SearchPage = () => {
                               {pharmacy.address}
                             </div>
                           </div>
-                          <Badge 
+                          <Badge
                             variant={pharmacy.inStock ? "default" : "secondary"}
                             className={pharmacy.inStock ? "bg-success text-success-foreground" : ""}
                           >
@@ -294,16 +299,16 @@ const SearchPage = () => {
                         {/* Similar Medicines Section */}
                         {pharmacy.similarMedicines && pharmacy.similarMedicines.length > 0 && (
                           <div className="mb-4">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               className="w-full justify-between text-primary hover:text-primary"
                               onClick={() => toggleSimilar(pharmacy.id)}
                             >
                               <span>{t("similarMedicinesAvailable")} ({pharmacy.similarMedicines.length})</span>
                               <ChevronRight className={`w-4 h-4 transition-transform ${expandedSimilar === pharmacy.id ? 'rotate-90' : ''}`} />
                             </Button>
-                            
+
                             {expandedSimilar === pharmacy.id && (
                               <div className="mt-2 space-y-2 p-3 bg-secondary/50 rounded-lg">
                                 <p className="text-xs text-muted-foreground mb-2">
@@ -329,8 +334,8 @@ const SearchPage = () => {
 
                         {pharmacy.inStock && (
                           <div className="flex gap-3">
-                            <Button 
-                              variant="hero" 
+                            <Button
+                              variant="hero"
                               className="flex-1"
                               onClick={() => openDirections(pharmacy.address)}
                             >
@@ -374,7 +379,7 @@ const SearchPage = () => {
           )}
 
           {/* Empty State */}
-          {!pharmacies.length && !isSearching && (
+          {!pharmacies.length && !isSearching && !searchError && (
             <div className="text-center py-16">
               <div className="w-24 h-24 rounded-full bg-secondary mx-auto mb-6 flex items-center justify-center">
                 <Search className="w-12 h-12 text-muted-foreground" />

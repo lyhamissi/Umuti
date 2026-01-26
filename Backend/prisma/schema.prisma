@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User roles enum
+enum Role {
+  USER
+  PHARMACY
+  ADMIN
+}
+
+// Application status enum
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// User model - for all types of users
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  name            String
+  phone           String?
+  role            Role      @default(USER)
+  isEmailVerified Boolean   @default(false)
+  emailOtp        String?
+  emailOtpExpiry  DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  pharmacy      Pharmacy?
+  searches      SearchHistory[]
+
+  @@map("users")
+}
+
+// Pharmacy model
+model Pharmacy {
+  id            String    @id @default(cuid())
+  name          String
+  address       String
+  phone         String
+  email         String
+  hours         String    @default("8:00 AM - 8:00 PM")
+  latitude      Float?
+  longitude     Float?
+  isVerified    Boolean   @default(false)
+  licenseNumber String?
+  licenseDocument String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  owner         User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId       String    @unique
+  medicines     PharmacyMedicine[]
+  application   PharmacyApplication?
+
+  @@map("pharmacies")
+}
+
+// Pharmacy Application model
+model PharmacyApplication {
+  id              String            @id @default(cuid())
+  pharmacyName    String
+  ownerName       String
+  email           String
+  phone           String
+  address         String
+  licenseNumber   String?
+  licenseDocument String?
+  status          ApplicationStatus @default(PENDING)
+  rejectionReason String?
+  submittedAt     DateTime          @default(now())
+  reviewedAt      DateTime?
+  reviewedBy      String?
+
+  // Relations
+  pharmacy        Pharmacy?         @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId      String?           @unique
+
+  @@map("pharmacy_applications")
+}
+
+// Medicine model - master list of medicines
+model Medicine {
+  id            String    @id @default(cuid())
+  name          String
+  genericName   String?
+  category      String
+  description   String?
+  dosageForm    String?   // tablet, capsule, syrup, etc.
+  strength      String?   // 500mg, 250mg, etc.
+  manufacturer  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  pharmacyMedicines PharmacyMedicine[]
+  similarTo     SimilarMedicine[] @relation("MainMedicine")
+  similarFrom   SimilarMedicine[] @relation("SimilarMedicine")
+
+  @@map("medicines")
+}
+
+// PharmacyMedicine - junction table for pharmacy inventory
+model PharmacyMedicine {
+  id            String    @id @default(cuid())
+  quantity      Int       @default(0)
+  price         Float
+  expiryDate    DateTime?
+  inStock       Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  pharmacy      Pharmacy  @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId    String
+  medicine      Medicine  @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  medicineId    String
+
+  @@unique([pharmacyId, medicineId])
+  @@map("pharmacy_medicines")
+}
+
+// Similar medicines relationship
+model SimilarMedicine {
+  id              String    @id @default(cuid())
+
+  mainMedicine    Medicine  @relation("MainMedicine", fields: [mainMedicineId], references: [id], onDelete: Cascade)
+  mainMedicineId  String
+
+  similarMedicine Medicine  @relation("SimilarMedicine", fields: [similarMedicineId], references: [id], onDelete: Cascade)
+  similarMedicineId String
+
+  @@unique([mainMedicineId, similarMedicineId])
+  @@map("similar_medicines")
+}
+
+// Search history for analytics
+model SearchHistory {
+  id            String    @id @default(cuid())
+  query         String
+  location      String?
+  resultsCount  Int       @default(0)
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId        String?
+
+  @@map("search_history")
+}

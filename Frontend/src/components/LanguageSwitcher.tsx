@@ -152,6 +152,31 @@ const translations: Record<Language, Record<string, string>> = {
     // Ad Carousel
     premiumPartner: "Premium Partner",
     rating: "rating",
+
+    // Login Page
+    welcomeBack: "Welcome Back",
+    signInToAccess: "Sign in to access your dashboard",
+    email: "Email",
+    emailPlaceholder: "you@example.com",
+    password: "Password",
+    forgotPassword: "Forgot password?",
+    signIn: "Sign In",
+    signingIn: "Signing in...",
+    dontHaveAccount: "Don't have an account?",
+    register: "Register",
+    demoAccounts: "Demo accounts:",
+    demoAccountsDesc: "Pharmacy: any email | Admin: admin@umuti.com",
+    loginSuccess: "Welcome back!",
+    loginSuccessDesc: "You have successfully logged in.",
+
+    // Forgot Password Page
+    forgotPasswordDesc: "Enter your email and we'll send you a link to reset your password.",
+    sendResetLink: "Send Reset Link",
+    sending: "Sending...",
+    checkYourEmail: "Check Your Email",
+    resetLinkSent: "We've sent a password reset link to",
+    tryDifferentEmail: "Try different email",
+    backToLogin: "Back to Login",
   },
   rw: {
     // Navbar
@@ -288,6 +313,31 @@ const translations: Record<Language, Record<string, string>> = {
     // Ad Carousel
     premiumPartner: "Umunyamuryango Wujuje",
     rating: "amanota",
+
+    // Login Page
+    welcomeBack: "Murakaza neza",
+    signInToAccess: "Injira kugirango ubone dashboard yawe",
+    email: "Imeli",
+    emailPlaceholder: "wewe@urugero.com",
+    password: "Ijambo ry'ibanga",
+    forgotPassword: "Wibagiwe ijambo ry'ibanga?",
+    signIn: "Injira",
+    signingIn: "Turinjiza...",
+    dontHaveAccount: "Nta konti ufite?",
+    register: "Iyandikishe",
+    demoAccounts: "Konti zo kugerageza:",
+    demoAccountsDesc: "Farumasi: imeli iyo ari yo yose | Admin: admin@umuti.com",
+    loginSuccess: "Murakaza neza!",
+    loginSuccessDesc: "Winjiye neza.",
+
+    // Forgot Password Page
+    forgotPasswordDesc: "Andika imeli yawe tuzohereze link yo guhindura ijambo ry'ibanga.",
+    sendResetLink: "Ohereza Link",
+    sending: "Twohereza...",
+    checkYourEmail: "Reba Imeli Yawe",
+    resetLinkSent: "Twohereje link yo guhindura ijambo ry'ibanga kuri",
+    tryDifferentEmail: "Gerageza imeli itandukanye",
+    backToLogin: "Subira ku Kwinjira",
   },
   fr: {
     // Navbar
@@ -424,6 +474,31 @@ const translations: Record<Language, Record<string, string>> = {
     // Ad Carousel
     premiumPartner: "Partenaire Premium",
     rating: "note",
+
+    // Login Page
+    welcomeBack: "Bon Retour",
+    signInToAccess: "Connectez-vous pour accéder à votre tableau de bord",
+    email: "Email",
+    emailPlaceholder: "vous@exemple.com",
+    password: "Mot de passe",
+    forgotPassword: "Mot de passe oublié?",
+    signIn: "Se Connecter",
+    signingIn: "Connexion...",
+    dontHaveAccount: "Vous n'avez pas de compte?",
+    register: "S'inscrire",
+    demoAccounts: "Comptes démo:",
+    demoAccountsDesc: "Pharmacie: n'importe quel email | Admin: admin@umuti.com",
+    loginSuccess: "Bon retour!",
+    loginSuccessDesc: "Vous vous êtes connecté avec succès.",
+
+    // Forgot Password Page
+    forgotPasswordDesc: "Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    sendResetLink: "Envoyer le Lien",
+    sending: "Envoi...",
+    checkYourEmail: "Vérifiez Votre Email",
+    resetLinkSent: "Nous avons envoyé un lien de réinitialisation à",
+    tryDifferentEmail: "Essayer un autre email",
+    backToLogin: "Retour à la Connexion",
   },
 };
 

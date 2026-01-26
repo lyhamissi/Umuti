@@ -9,14 +9,20 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg hover:shadow-primary/20",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-md",
-        outline: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        default:
+          "bg-primary text-primary-foreground border-2 border-primary hover:bg-primary/90 hover:border-primary/90 shadow-md hover:shadow-lg hover:shadow-primary/25 dark:shadow-primary/10 dark:hover:shadow-primary/20",
+        destructive:
+          "bg-destructive text-destructive-foreground border-2 border-destructive hover:bg-destructive/90 hover:border-destructive/90 shadow-md hover:shadow-destructive/25",
+        outline:
+          "border-2 border-primary/60 bg-transparent text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary dark:border-primary/50 dark:hover:border-primary dark:hover:bg-primary/90",
+        secondary:
+          "bg-secondary text-secondary-foreground border-2 border-secondary hover:bg-secondary/80 hover:border-primary/30 dark:border-secondary dark:hover:border-primary/40",
+        ghost:
+          "hover:bg-accent/80 hover:text-accent-foreground border-2 border-transparent hover:border-primary/20 dark:hover:border-primary/30",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "gradient-primary text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]",
-        glass: "bg-card/80 backdrop-blur-sm border border-border text-foreground hover:bg-card shadow-md",
+        hero: "gradient-primary text-primary-foreground border-2 border-primary/80 shadow-lg hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] dark:border-primary/60 dark:hover:shadow-primary/20",
+        glass:
+          "bg-card/80 backdrop-blur-sm border-2 border-border text-foreground hover:bg-card hover:border-primary/40 shadow-md dark:border-border dark:hover:border-primary/50",
       },
       size: {
         default: "h-10 px-4 py-2",
