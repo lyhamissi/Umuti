@@ -9,11 +9,32 @@ import AdCarousel from "../components/AdCarousel";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../components/LanguageSwitcher";
+import { searchApi } from "../lib/api";
+import { useEffect } from "react";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [platformStats, setPlatformStats] = useState({
+    medicines: 0,
+    pharmacies: 0,
+    users: 0
+  });
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await searchApi.getStats();
+        if (response.data) {
+          setPlatformStats(response.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch platform stats:", err);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,9 +67,21 @@ const Index = () => {
   ];
 
   const stats = [
-    { icon: Pill, value: "10,000+", labelKey: "medicinesListed" },
-    { icon: Building2, value: "500+", labelKey: "pharmacies" },
-    { icon: Users, value: "50,000+", labelKey: "happyUsers" },
+    { 
+      icon: Pill, 
+      value: platformStats.medicines > 0 ? platformStats.medicines.toLocaleString() + "+" : "1,000+", 
+      labelKey: "medicinesListed" 
+    },
+    { 
+      icon: Building2, 
+      value: platformStats.pharmacies > 0 ? platformStats.pharmacies.toLocaleString() + "+" : "10+", 
+      labelKey: "pharmacies" 
+    },
+    { 
+      icon: Users, 
+      value: platformStats.users > 0 ? platformStats.users.toLocaleString() + "+" : "100+", 
+      labelKey: "happyUsers" 
+    },
   ];
 
   return (

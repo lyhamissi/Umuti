@@ -7,70 +7,76 @@ import {
   CarouselPrevious,
 } from "../components/ui/carousel";
 import { Badge } from "../components/ui/badge";
-import { MapPin, Star, Clock } from "lucide-react";
+import { MapPin, Star, Clock, Building2 } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
 import { useLanguage } from "../components/LanguageSwitcher";
-
-interface PharmacyAd {
-  id: number;
-  name: string;
-  tagline: string;
-  location: string;
-  rating: number;
-  hours: string;
-  featured: boolean;
-  bgColor: string;
-}
-
-const pharmacyAds: PharmacyAd[] = [
-  {
-    id: 1,
-    name: "HealthPlus Pharmacy",
-    tagline: "Your trusted health partner since 2010",
-    location: "Kigali City Center",
-    rating: 4.9,
-    hours: "Open 24/7",
-    featured: true,
-    bgColor: "from-primary/20 to-primary/5",
-  },
-  {
-    id: 2,
-    name: "MediCare Rwanda",
-    tagline: "Quality medicines at affordable prices",
-    location: "Kimironko",
-    rating: 4.7,
-    hours: "7AM - 10PM",
-    featured: true,
-    bgColor: "from-success/20 to-success/5",
-  },
-  {
-    id: 3,
-    name: "Pharma Express",
-    tagline: "Fast service, reliable care",
-    location: "Nyamirambo",
-    rating: 4.8,
-    hours: "6AM - 11PM",
-    featured: true,
-    bgColor: "from-warning/20 to-warning/5",
-  },
-  {
-    id: 4,
-    name: "Green Cross Pharmacy",
-    tagline: "Natural remedies & modern medicine",
-    location: "Remera",
-    rating: 4.6,
-    hours: "8AM - 9PM",
-    featured: true,
-    bgColor: "from-secondary to-secondary/50",
-  },
-];
+import { useEffect, useState } from "react";
+import { pharmacyApi, type Pharmacy } from "../lib/api";
+import { Skeleton } from "./ui/skeleton";
 
 const AdCarousel = () => {
   const { t } = useLanguage();
+  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const plugin = useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true })
   );
+
+  useEffect(() => {
+    const fetchPharmacies = async () => {
+      try {
+        const response = await pharmacyApi.getAll({ verified: true, limit: 10 });
+        if (response.success && response.data) {
+          setPharmacies(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch featured pharmacies:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPharmacies();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Card className="w-full h-[400px] md:h-[500px] animate-pulse bg-muted/20">
+        <div className="p-8 md:p-12 space-y-6">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-12 w-2/3" />
+          <Skeleton className="h-6 w-1/2" />
+          <div className="space-y-3 pt-12">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-5 w-36" />
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (pharmacies.length === 0) {
+    return (
+      <Card className="w-full h-[400px] md:h-[500px] bg-gradient-to-br from-primary/10 to-transparent flex items-center justify-center text-center p-8">
+        <div className="space-y-4">
+          <Building2 className="w-16 h-16 text-primary/40 mx-auto" />
+          <h3 className="text-2xl font-bold">{t("verifiedPharmacies")}</h3>
+          <p className="text-muted-foreground">{t("nearbyPharmaciesDesc")}</p>
+        </div>
+      </Card>
+    );
+  }
+
+  const getAdBg = (index: number) => {
+    const colors = [
+      "from-primary/20 to-primary/5",
+      "from-success/20 to-success/5",
+      "from-warning/20 to-warning/5",
+      "from-secondary to-secondary/50"
+    ];
+    return colors[index % colors.length];
+  };
 
   return (
     <div className="relative w-full">
@@ -83,34 +89,34 @@ const AdCarousel = () => {
         }}
       >
         <CarouselContent>
-          {pharmacyAds.map((ad) => (
-            <CarouselItem key={ad.id}>
-              <Card className={`border-0 bg-gradient-to-br ${ad.bgColor} overflow-hidden`}>
+          {pharmacies.map((pharmacy, index) => (
+            <CarouselItem key={pharmacy.id}>
+              <Card className={`border-0 bg-gradient-to-br ${getAdBg(index)} overflow-hidden`}>
                 <CardContent className="p-8 md:p-12 h-[400px] md:h-[500px] flex flex-col justify-between">
                   <div>
                     <Badge variant="secondary" className="mb-4">
                       ⭐ {t("premiumPartner")}
                     </Badge>
                     <h3 className="text-3xl md:text-4xl font-bold mb-3">
-                      {ad.name}
+                      {pharmacy.name}
                     </h3>
                     <p className="text-lg md:text-xl text-muted-foreground mb-6">
-                      {ad.tagline}
+                      {pharmacy.address}
                     </p>
                   </div>
                   
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <MapPin className="w-5 h-5 text-primary" />
-                      <span>{ad.location}</span>
+                      <span>{pharmacy.address}</span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Star className="w-5 h-5 text-warning fill-warning" />
-                      <span>{ad.rating} {t("rating")}</span>
+                      <span>4.8 {t("rating")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Clock className="w-5 h-5 text-success" />
-                      <span>{ad.hours}</span>
+                      <span>{pharmacy.hours || "Open 24/7"}</span>
                     </div>
                   </div>
                 </CardContent>

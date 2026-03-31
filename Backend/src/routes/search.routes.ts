@@ -268,4 +268,26 @@ router.get("/suggestions", async (req, res, next) => {
   }
 });
 
+// Get platform statistics
+router.get("/stats", async (req, res, next) => {
+  try {
+    const [totalMedicines, totalPharmacies, totalUsers] = await Promise.all([
+      prisma.medicine.count(),
+      prisma.pharmacy.count({ where: { isVerified: true } }),
+      prisma.user.count(),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        medicines: totalMedicines,
+        pharmacies: totalPharmacies,
+        users: totalUsers,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

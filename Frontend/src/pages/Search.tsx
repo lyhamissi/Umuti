@@ -9,7 +9,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useLanguage } from "../components/LanguageSwitcher";
 import { useToast } from "../hooks/use-toast";
-import { searchApi, type SearchResult } from "../lib/api";
+import { searchApi } from "../lib/api";
 
 interface DisplayPharmacy {
   id: string;
@@ -25,27 +25,20 @@ interface DisplayPharmacy {
   similarMedicines?: { name: string; price: string }[];
 }
 
-const formatPrice = (price: number): string => {
-  return `${price.toLocaleString()} RWF`;
-};
 
-const formatDistance = (distanceKm?: number): string => {
-  if (!distanceKm) return "N/A";
-  return `${distanceKm.toFixed(1)} km`;
-};
 
-const mapSearchResultToPharmacy = (result: SearchResult): DisplayPharmacy => ({
-  id: result.pharmacy.id,
-  name: result.pharmacy.name,
-  address: result.pharmacy.address,
-  distance: formatDistance(result.distance),
-  phone: result.pharmacy.phone,
-  hours: result.pharmacy.hours || "Hours not available",
-  inStock: result.inStock,
-  quantity: result.quantity,
-  price: formatPrice(result.price),
-  strength: result.medicine?.strength,
-  similarMedicines: [],
+const mapSearchResultToPharmacy = (pharmacy: any, medicine: any): DisplayPharmacy => ({
+  id: pharmacy.id,
+  name: pharmacy.name,
+  address: pharmacy.address,
+  distance: pharmacy.distance || "N/A",
+  phone: pharmacy.phone,
+  hours: pharmacy.hours || "Hours not available",
+  inStock: pharmacy.inStock,
+  quantity: medicine.quantity,
+  price: medicine.price,
+  strength: medicine.strength,
+  similarMedicines: medicine.similarMedicines || [],
 });
 
 const SearchPage = () => {
@@ -78,8 +71,18 @@ const SearchPage = () => {
       });
 
       if (response.data?.results) {
-        const mappedPharmacies = response.data.results.map(mapSearchResultToPharmacy);
-        setPharmacies(mappedPharmacies);
+        // Flatten the pharmacy-centric results into medicine results
+        const flattenedResults: DisplayPharmacy[] = [];
+        
+        response.data.results.forEach((pharmacy: any) => {
+          if (pharmacy.medicines && pharmacy.medicines.length > 0) {
+            pharmacy.medicines.forEach((medicine: any) => {
+              flattenedResults.push(mapSearchResultToPharmacy(pharmacy, medicine));
+            });
+          }
+        });
+        
+        setPharmacies(flattenedResults);
       } else {
         setPharmacies([]);
       }

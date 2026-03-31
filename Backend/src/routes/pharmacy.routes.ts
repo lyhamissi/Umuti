@@ -38,6 +38,9 @@ router.get("/", async (req, res, next) => {
   try {
     const { verified, limit = "50", offset = "0" } = req.query;
 
+    const pageSize = parseInt(limit as string) || 50;
+    const skipValue = parseInt(offset as string) || 0;
+
     const pharmacies = await prisma.pharmacy.findMany({
       where: {
         ...(verified === "true" && { isVerified: true }),
@@ -53,8 +56,8 @@ router.get("/", async (req, res, next) => {
         longitude: true,
         isVerified: true,
       },
-      take: parseInt(limit as string),
-      skip: parseInt(offset as string),
+      take: pageSize,
+      skip: skipValue,
       orderBy: { name: "asc" },
     });
 
@@ -69,8 +72,8 @@ router.get("/", async (req, res, next) => {
       data: pharmacies,
       meta: {
         total,
-        limit: parseInt(limit as string),
-        offset: parseInt(offset as string),
+        limit: pageSize,
+        offset: skipValue,
       },
     });
   } catch (error) {

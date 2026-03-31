@@ -7,11 +7,10 @@ import {
   Package,
   User,
   Menu,
-  X,
   LogOut,
-  ChevronLeft
 } from "lucide-react";
 import { ThemeDropdown } from "./ThemeDropdown";
+import { useAuth } from "./AuthProvider";
 
 interface PharmacySidebarProps {
   children: React.ReactNode;
@@ -20,6 +19,7 @@ interface PharmacySidebarProps {
 const PharmacySidebar = ({ children }: PharmacySidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { logout } = useAuth();
 
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/pharmacy/dashboard" },
@@ -40,8 +40,8 @@ const PharmacySidebar = ({ children }: PharmacySidebarProps) => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-        <div className="flex flex-col h-full">
+      <aside className={`fixed lg:sticky top-0 left-0 z-50 w-72 h-screen bg-card/80 backdrop-blur-xl border-r border-border transform transition-all duration-500 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className="flex flex-col h-full shadow-2xl lg:shadow-none">
           <div className="p-6 border-b border-border">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
@@ -57,13 +57,21 @@ const PharmacySidebar = ({ children }: PharmacySidebarProps) => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive(item.path)
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                className={`group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 relative overflow-hidden ${isActive(item.path)
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary hover:translate-x-1"
                   }`}
               >
-                <item.icon className="w-5 h-5" />
-                {item.label}
+                {isActive(item.path) && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-50" />
+                )}
+                <item.icon className={`w-5 h-5 transition-transform duration-300 ${!isActive(item.path) && "group-hover:scale-110 group-hover:rotate-6"}`} />
+                <span className="font-medium">{item.label}</span>
+                {!isActive(item.path) && (
+                   <div className="ml-auto opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                   </div>
+                )}
               </Link>
             ))}
             <ThemeDropdown />
@@ -71,11 +79,11 @@ const PharmacySidebar = ({ children }: PharmacySidebarProps) => {
           </nav>
 
           <div className="p-4 border-t border-border space-y-2">
-            <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors px-4 py-2">
-              <ChevronLeft className="w-4 h-4" />
-              Back to Home
-            </Link>
-            <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-destructive">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-muted-foreground hover:text-destructive"
+              onClick={logout}
+            >
               <LogOut className="w-5 h-5 mr-3" />
               Logout
             </Button>

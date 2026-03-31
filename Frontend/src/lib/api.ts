@@ -91,6 +91,7 @@ export interface PharmacyMedicine {
   medicineId: string;
   quantity: number;
   price: number;
+  expiryDate?: string;
   inStock: boolean;
   pharmacy?: Pharmacy;
   medicine?: Medicine;
@@ -106,6 +107,7 @@ export interface AddInventoryData {
   medicineId: string;
   quantity: number;
   price: number;
+  expiryDate?: string;
 }
 
 export interface SearchParams {
@@ -157,6 +159,12 @@ export interface PharmacyApplication {
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
+  stats?: any;
+  meta?: {
+    total: number;
+    limit: number;
+    offset: number;
+  };
   message?: string;
   error?: string;
 }
@@ -297,7 +305,7 @@ export const pharmacyApi = {
     const queryString = params
       ? "?" + new URLSearchParams(params as Record<string, string>).toString()
       : "";
-    return request<{ pharmacies: Pharmacy[]; total: number; page: number; limit: number }>(
+    return request<Pharmacy[]>(
       `/pharmacies${queryString}`
     );
   },
@@ -317,8 +325,8 @@ export const pharmacyApi = {
     });
   },
 
-  update: async (id: string, data: Partial<CreatePharmacyData>) => {
-    return request<{ pharmacy: Pharmacy }>(`/pharmacies/${id}`, {
+  update: async (data: Partial<CreatePharmacyData>) => {
+    return request<{ pharmacy: Pharmacy }>("/pharmacies", {
       method: "PUT",
       body: JSON.stringify(data),
     });
@@ -361,7 +369,7 @@ export const medicineApi = {
     const queryString = params
       ? "?" + new URLSearchParams(params as Record<string, string>).toString()
       : "";
-    return request<{ medicines: Medicine[]; total: number; page: number; limit: number }>(
+    return request<Medicine[]>(
       `/medicines${queryString}`
     );
   },
@@ -422,6 +430,20 @@ export const medicineApi = {
       method: "DELETE",
     });
   },
+
+  addToInventoryBulk: async (items: { medicineId: string; quantity: number; price: number; expiryDate?: string }[]) => {
+    return request<{ data: PharmacyMedicine[] }>("/medicines/inventory/bulk", {
+      method: "POST",
+      body: JSON.stringify({ items }),
+    });
+  },
+
+  createSimilarity: async (mainMedicineId: string, similarMedicineIds: string[]) => {
+    return request<{ message: string }>("/medicines/similar", {
+      method: "POST",
+      body: JSON.stringify({ mainMedicineId, similarMedicineIds }),
+    });
+  },
 };
 
 // Search API
@@ -447,6 +469,10 @@ export const searchApi = {
     return request<{ message: string }>("/search/history", {
       method: "DELETE",
     });
+  },
+
+  getStats: async () => {
+    return request<{ medicines: number; pharmacies: number; users: number }>("/search/stats");
   },
 };
 

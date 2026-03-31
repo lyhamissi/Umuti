@@ -131,12 +131,7 @@ const Login = () => {
             </Link>
           </div>
 
-          <div className="mt-6 p-4 bg-secondary rounded-lg">
-            <p className="text-sm text-muted-foreground text-center">
-              <strong>{t("demoAccounts")}</strong><br />
-              {t("demoAccountsDesc")}
-            </p>
-          </div>
+
         </CardContent>
       </Card>
     </div>

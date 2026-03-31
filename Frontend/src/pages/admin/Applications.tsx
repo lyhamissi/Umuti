@@ -324,7 +324,10 @@ const AdminApplications = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => window.open(selectedApp.licenseDocument!, '_blank')}
+                            onClick={() => {
+                              const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
+                              window.open(`${baseUrl}/uploads/${selectedApp.licenseDocument}`, '_blank');
+                            }}
                           >
                             <ExternalLink className="w-4 h-4 mr-1" />
                             View
