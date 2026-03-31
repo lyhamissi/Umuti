@@ -21,7 +21,11 @@ async function testApi() {
         console.log(`❌ Error from API: ${data.message}`);
       }
     } catch (err) {
-      console.error(`❌ Request failed: ${err.message}`);
+      if (err instanceof Error) {
+        console.error(`❌ Request failed: ${err.message}`);
+      } else {
+        console.error(`❌ Request failed: ${String(err)}`);
+      }
     }
     console.log('---');
   }
