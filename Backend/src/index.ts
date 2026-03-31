@@ -22,6 +22,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://umuti.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
