@@ -15,6 +15,7 @@ import adminRoutes from "./routes/admin.routes.js";
 
 // Import middleware
 import { errorHandler } from "./middleware/error.middleware.js";
+import { initAdmin } from "./utils/init-admin.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -79,9 +80,12 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 UMUTI API server running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
+  
+  // Initialize default admin
+  await initAdmin();
 });
 
 export default app;
