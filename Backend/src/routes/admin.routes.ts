@@ -180,7 +180,7 @@ router.post("/applications/:id/approve", async (req, res, next) => {
     }
 
     // Update application and pharmacy in transaction
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // Update application
       await tx.pharmacyApplication.update({
         where: { id: req.params.id },
@@ -234,7 +234,7 @@ router.post(
       const { reason } = req.body;
 
       const application = await prisma.pharmacyApplication.findUnique({
-        where: { id: req.params.id },
+        where: { id: req.params.id as string },
         include: {
           pharmacy: {
             include: {
@@ -253,7 +253,7 @@ router.post(
       }
 
       await prisma.pharmacyApplication.update({
-        where: { id: req.params.id },
+        where: { id: req.params.id as string },
         data: {
           status: "REJECTED",
           rejectionReason: reason,
@@ -263,12 +263,13 @@ router.post(
       });
 
       // Send rejection email with reason
-      if (application.pharmacy?.owner) {
+      const app = application as any;
+      if (app.pharmacy?.owner) {
         await sendEmail(
-          application.email,
+          app.email,
           "applicationRejected",
-          application.pharmacy.owner.name,
-          application.pharmacyName,
+          app.pharmacy.owner.name,
+          app.pharmacyName,
           reason
         );
       }

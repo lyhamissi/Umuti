@@ -55,7 +55,7 @@ router.get("/", async (req, res, next) => {
       });
     }
 
-    const medicineIds = medicines.map((m) => m.id);
+    const medicineIds = medicines.map((m: any) => m.id);
 
     // Find pharmacies with these medicines in stock
     const pharmacyMedicines = await prisma.pharmacyMedicine.findMany({

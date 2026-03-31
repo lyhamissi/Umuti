@@ -140,7 +140,7 @@ router.get("/categories", async (req, res, next) => {
     });
     res.json({
       success: true,
-      data: categories.map((c) => c.category),
+      data: categories.map((c: any) => c.category),
     });
   } catch (error) {
     next(error);
@@ -172,10 +172,10 @@ router.get(
 
       const stats = {
         total: inventory.length,
-        inStock: inventory.filter((i) => i.inStock).length,
-        lowStock: inventory.filter((i) => i.quantity > 0 && i.quantity < 20).length,
-        outOfStock: inventory.filter((i) => !i.inStock || i.quantity === 0).length,
-        totalValue: inventory.reduce((sum, i) => sum + i.price * i.quantity, 0),
+        inStock: inventory.filter((i: any) => i.inStock).length,
+        lowStock: inventory.filter((i: any) => i.quantity > 0 && i.quantity < 20).length,
+        outOfStock: inventory.filter((i: any) => !i.inStock || i.quantity === 0).length,
+        totalValue: inventory.reduce((sum: number, i: any) => sum + i.price * i.quantity, 0),
       };
 
       res.json({
@@ -270,7 +270,7 @@ router.post(
         throw new AppError("Pharmacy not found", 404);
       }
 
-      const results = await prisma.$transaction(async (tx) => {
+      const results = await prisma.$transaction(async (tx: any) => {
         const entries = [];
         for (const item of items) {
           let medicineId = item.medicineId;

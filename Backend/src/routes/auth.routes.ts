@@ -155,7 +155,7 @@ router.post("/register/pharmacy", validate(pharmacyRegisterSchema), async (req, 
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user and pharmacy application in a transaction
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Create user with PHARMACY role
       const user = await tx.user.create({
         data: {
