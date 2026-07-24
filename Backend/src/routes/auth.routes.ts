@@ -206,13 +206,9 @@ router.post("/register/pharmacy", validate(pharmacyRegisterSchema), async (req, 
     console.log("Pharmacy registered successfully:", result.pharmacy.id);
     console.log("Application created:", result.application.id);
 
-    // Send verification OTP email
-    const otpSent = await sendEmail(email, "verificationOTP", name, otp);
-    console.log("OTP email sent:", otpSent);
-
-    // Send welcome email about application
-    const welcomeSent = await sendEmail(email, "welcomePharmacy", name, pharmacyName);
-    console.log("Welcome email sent:", welcomeSent);
+    // Send combined verification OTP & pharmacy welcome email
+    const emailSent = await sendEmail(email, "pharmacyVerificationOTP", name, pharmacyName, otp);
+    console.log("Pharmacy verification email sent:", emailSent);
 
     res.status(201).json({
       success: true,

@@ -5,9 +5,13 @@ const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
   port: parseInt(process.env.SMTP_PORT || "587"),
   secure: process.env.SMTP_SECURE === "true",
+  pool: true,
+  maxConnections: 5,
+  maxMessages: 100,
+  connectionTimeout: 10000,
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s+/g, "") : "",
   },
 });
 
@@ -225,6 +229,57 @@ const emailTemplates = {
       </html>
     `,
   }),
+
+  pharmacyVerificationOTP: (name: string, pharmacyName: string, otp: string) => ({
+    subject: "UMUTI - Verify Your Pharmacy Account",
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .header { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); padding: 30px; text-align: center; }
+          .header h1 { color: white; margin: 0; font-size: 28px; }
+          .content { padding: 40px 30px; }
+          .otp-box { background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 8px; padding: 20px; text-align: center; margin: 25px 0; }
+          .otp-code { font-size: 36px; font-weight: bold; color: #16a34a; letter-spacing: 8px; }
+          .footer { background: #f9fafb; padding: 20px 30px; text-align: center; color: #6b7280; font-size: 14px; }
+          .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; margin-top: 20px; font-size: 14px; }
+          .info-box { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 15px; margin-top: 20px; font-size: 14px; color: #334155; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>UMUTI</h1>
+            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Rwanda Medicine Finder</p>
+          </div>
+          <div class="content">
+            <h2 style="color: #1f2937; margin-top: 0;">Welcome ${name}!</h2>
+            <p style="color: #4b5563; line-height: 1.6;">
+              Thank you for registering <strong>${pharmacyName}</strong> with UMUTI. To complete your account registration, please use the verification code below:
+            </p>
+            <div class="otp-box">
+              <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;">Your Verification Code</p>
+              <div class="otp-code">${otp}</div>
+            </div>
+            <div class="info-box">
+              <strong>Next Steps:</strong> After verifying your email, your pharmacy application will be reviewed by our admin team (usually takes 1-2 business days). You will be notified via email upon approval!
+            </div>
+            <div class="warning">
+              <strong>Important:</strong> This verification code expires in 15 minutes.
+            </div>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} UMUTI. All rights reserved.</p>
+            <p>Kigali, Rwanda</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  }),
 };
 
 // Send email function
@@ -234,6 +289,11 @@ export const sendEmail = async (
   ...args: Parameters<(typeof emailTemplates)[typeof template]>
 ): Promise<boolean> => {
   try {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.warn("⚠️ SMTP credentials missing in environment variables. Email sending skipped.");
+      return false;
+    }
+
     // @ts-ignore - dynamic template call
     const { subject, html } = emailTemplates[template](...args);
 
@@ -244,10 +304,10 @@ export const sendEmail = async (
       html,
     });
 
-    console.log("Email sent:", info.messageId);
+    console.log(`✅ Email [${template}] successfully sent to ${to}. MessageId: ${info.messageId}`);
     return true;
   } catch (error) {
-    console.error("Email send error:", error);
+    console.error(`❌ Email [${template}] send failed for ${to}:`, error);
     return false;
   }
 };
